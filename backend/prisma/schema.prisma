@@ -1,0 +1,28 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]  // Adiciona o target correto
+}
+
+
+model Cliente {
+  id      Int     @id @default(autoincrement())
+  nome    String
+  email   String  @unique
+  status  Boolean @default(true)
+  ativos  Ativo[] // Adicionando o campo de relação inversa com Ativo
+  @@map("cliente")
+}
+
+model Ativo {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  valor     Float
+  clienteId Int
+  cliente   Cliente  @relation(fields: [clienteId], references: [id]) // Definindo a relação corretamente
+}
+

@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: gustavo123
+      MYSQL_DATABASE: betteredge_case
+    ports:
+      - "3308:3306"
+    volumes:
+      - betteredgecase_db-data:/var/lib/mysql
+    networks:
+      - betteredge_network
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: mysql://root:gustavo123@db:3306/betteredge_case
+    ports:
+      - "3002:3002"
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app
+    command: node src/index.js
+    networks:
+      - betteredge_network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+    command: npm run start
+    networks:
+      - betteredge_network
+
+volumes:
+  betteredgecase_db-data:
+
+networks:
+  betteredge_network:
+    driver: bridge
